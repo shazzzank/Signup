@@ -38,7 +38,7 @@ function getLogin(req, res){
 
 function postLogin(req, res){
 	const email= req.body.email;
-	const password= req.body.password; 
+	const password= md5(req.body.password);  //Level 3 security
 	Model.findOne({email: email}, (err, object)=>{
 		if(err){ console.log(err); }
 		else {
