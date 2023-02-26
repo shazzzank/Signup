@@ -1,0 +1,24 @@
+<%- include('partials/header') %>
+
+<form action="/" method="POST">
+    <div class="p-5 mb-4 bg-light rounded-3">
+        <div class="container-fluid py-5">
+            <h1 class="display-5 fw-bold">Create your free account</h1>
+            <div class="spacing">
+                <label class="form-label">Email address</label>
+                <input class="form-control" name="email" type="email">
+                <label class="form-label">Password</label>
+                <input class="form-control" name="password" type="password">
+            </div>
+            <button class="btn btn-primary btn-lg" name="register">Sign up with Email</button>
+            <p class="text-center text-muted mt-5 mb-0">
+                Have already an account?
+                <a href="/login" class="fw-bold text-body">
+                    <u>Login here</u>
+                </a>
+            </p>
+        </div>
+    </div>
+</form>
+
+<%- include('partials/footer') %>
