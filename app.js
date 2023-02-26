@@ -1,10 +1,9 @@
-//require('dotenv').config(); //Level 2 Security
-//const encrypt = require('mongoose-encryption')  //Level 1 Security
 const bodyparser = require('body-parser')
 const mongoose = require('mongoose')
 const express = require('express')
 const ejs = require('ejs')
-const md5 = require('md5') //Level 3 Security
+const bcrypt = require('bcrypt'); 
+const saltrounds = 10; 
 const app = express();
 
 app.use(bodyparser.urlencoded({extended: true}));
@@ -22,14 +21,16 @@ function getHome(req, res){
 }
 
 function postHome(req, res){
-	const doc1 = new Model({
-		email: req.body.email,
-		password: md5(req.body.password) //Level 3 security
-	});
-	doc1.save((err)=>{
-		if(err) console.log(err);
-		else res.render('success');
-	});
+	bcrypt.hash(req.body.password ,saltrounds, (err, hash)=>{
+		const doc1 = new Model({
+			email: req.body.email,
+			password: hash 
+		});
+		doc1.save((err)=>{
+			if(err) console.log(err);
+			else res.render('success');
+		});		
+	})
 }
 
 function getLogin(req, res){
@@ -38,14 +39,15 @@ function getLogin(req, res){
 
 function postLogin(req, res){
 	const email= req.body.email;
-	const password= md5(req.body.password);  //Level 3 security
+	const password= req.body.password;
 	Model.findOne({email: email}, (err, object)=>{
 		if(err){ console.log(err); }
 		else {
 			if(object){
-				if(object.password == password){
-					res.render('success');
-				} else res.redirect('/login')
+				bcrypt.compare(password, object.password, (err, result)=>{
+					if(result == true) res.render('success');
+					else res.redirect('/login');
+				});
 			} else res.redirect('/login')
 		}
 	});
@@ -57,7 +59,4 @@ function server(){
 
 mongoose.connect('mongodb://localhost:27017/userDB');
 const schema = new mongoose.Schema({ email: String, password: String })
-//const password = "1234567890"; //Level 1 Security
-//const password = process.env.DB_PASS; //Level 2 Security
-//schema.plugin(encrypt, {secret: password, encryptedFields: ['password']}); //Level 1/2 Security
 const Model = new mongoose.model('User', schema);
